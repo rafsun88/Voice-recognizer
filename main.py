@@ -4,12 +4,10 @@ import librosa
 import soundfile as sf
 from speechbrain.pretrained import SpeakerRecognition
 
-# ====== Step 1: Preprocessing Function ======
 def preprocess_audio(input_path, output_path=None, target_sr=16000, top_db=30):
-    # Load with original sampling rate
+
     y, sr = librosa.load(input_path, sr=None)
 
-    # Resample to 16kHz
     if sr != target_sr:
         y = librosa.resample(y, orig_sr=sr, target_sr=target_sr)
         sr = target_sr
@@ -22,7 +20,7 @@ def preprocess_audio(input_path, output_path=None, target_sr=16000, top_db=30):
     if peak > 0:
         y = y / peak
 
-    # Set default output path
+
     if output_path is None:
         filename = os.path.basename(input_path)
         output_path = os.path.join(os.path.dirname(input_path), f"cleaned_{filename}")
@@ -32,7 +30,6 @@ def preprocess_audio(input_path, output_path=None, target_sr=16000, top_db=30):
     print(f"✅ Processed and saved: {output_path}")
     return output_path
 
-# ====== Step 2: Speaker Verification Function ======
 def verify_speakers(audio1, audio2, threshold=0.60):
     # Load pretrained model
     verification = SpeakerRecognition.from_hparams(
@@ -44,7 +41,7 @@ def verify_speakers(audio1, audio2, threshold=0.60):
     clean1 = preprocess_audio(audio1)
     clean2 = preprocess_audio(audio2)
 
-    # Run verification
+
     score, _ = verification.verify_files(clean1, clean2)
     score_val = score.item()
 
@@ -54,9 +51,8 @@ def verify_speakers(audio1, audio2, threshold=0.60):
     else:
         print("🔴 Result: Different Speakers")
 
-# ====== Step 3: Run with Example Files ======
+
 if __name__ == "__main__":
-    # Replace with your filenames
     voice1 = "owner.wav"
     voice2 = "record_out.wav"
 
